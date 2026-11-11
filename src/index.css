@@ -536,12 +536,18 @@ body {
 
 .pin,
 .slot {
-  height: calc(34cqw + 58px);
+  min-height: calc(34cqw + 58px);
   border-radius: 20px;
+}
+
+.slot {
+  height: calc(34cqw + 58px);
 }
 
 /* thẻ đã ghim */
 .pin {
+  container-type: inline-size;
+  height: auto;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -585,23 +591,27 @@ body {
   box-shadow: 0 4px 6px rgba(89, 13, 34, 0.35);
 }
 
-/* tên: luôn nằm trên một dòng */
+/* tên: hiển thị đầy đủ */
 .pin-names {
   max-width: 100%;
+  width: 100%;
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: baseline;
-  gap: 4px;
-  white-space: nowrap;
+  align-items: center;
+  gap: 2px 4px;
+  text-align: center;
   font-weight: 600;
-  font-size: clamp(0.72rem, 8.4cqw, 0.95rem);
+  font-size: clamp(0.68rem, calc(150cqw / var(--n, 14)), 0.92rem);
+  line-height: 1.25;
   color: var(--wine);
+  word-break: break-word;
 }
 
 .pin-names span {
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  word-break: normal;
+  overflow-wrap: break-word;
 }
 
 .pin-names i {

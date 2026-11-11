@@ -1,4 +1,4 @@
-import { useEffect, useId, useMemo, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState } from "react";
 
 const HEART_PATH =
   "M100 170 C20 110 0 70 0 45 C0 20 20 0 50 0 C75 0 92 15 100 30 C108 15 125 0 150 0 C180 0 200 20 200 45 C200 70 180 110 100 170 Z";
@@ -219,7 +219,7 @@ function PinColumn({ side, pins, onRemove }) {
         {mine.map((p) => (
           <li key={p.id} className={`pin ${p.leaving ? "leaving" : ""}`} title={`${p.a} ♥ ${p.b}`}>
             <span className="pushpin" />
-            <div className="pin-names">
+            <div className="pin-names" style={{ "--n": p.a.length + p.b.length + 3 }}>
               <span>{p.a}</span>
               <i>♥</i>
               <span>{p.b}</span>
@@ -249,6 +249,13 @@ export default function App() {
   const [target, setTarget] = useState(0);
   const [shown, setShown] = useState(0);
   const [couple, setCouple] = useState({ a: "", b: "" });
+  const input1Ref = useRef(null);
+
+  useEffect(() => {
+    if (stage === "form") {
+      input1Ref.current?.focus();
+    }
+  }, [stage]);
   const [pins, setPins] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -274,6 +281,8 @@ export default function App() {
   }
 
   function reset() {
+    setName1("");
+    setName2("");
     setStage("form");
     setShown(0);
   }
@@ -363,6 +372,7 @@ export default function App() {
               <label className="field">
                 <span>Tên người thứ nhất</span>
                 <input
+                  ref={input1Ref}
                   value={name1}
                   onChange={(e) => setName1(e.target.value)}
                   placeholder="Ví dụ: Minh"
@@ -416,7 +426,7 @@ export default function App() {
                   {isPinned ? "Đã ghim ✓" : "♥ Ghim cặp đôi"}
                 </button>
                 <button className="btn ghost" onClick={reset}>
-                  Thử cặp tên khác
+                  Thử cặp khác
                 </button>
               </div>
             </section>
