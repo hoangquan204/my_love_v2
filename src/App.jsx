@@ -43,14 +43,17 @@ function BigHeart({ value }) {
 
   const bursts = useMemo(
     () =>
-      Array.from({ length: 16 }, (_, i) => {
-        const angle = (i / 16) * Math.PI * 2 + Math.random() * 0.3;
-        const dist = 150 + Math.random() * 90;
+      Array.from({ length: 18 }, (_, i) => {
+        const angle = (i / 18) * Math.PI * 2 + Math.random() * 0.25;
+        const dist = 145 + Math.random() * 95;
+        const symbols = ["♥", "✦", "💖", "✧", "♥", "✨"];
         return {
+          symbol: symbols[i % symbols.length],
           dx: Math.cos(angle) * dist,
           dy: Math.sin(angle) * dist - 30,
-          size: 14 + Math.random() * 18,
-          delay: Math.random() * 0.4,
+          size: 13 + Math.random() * 18,
+          delay: Math.random() * 0.45,
+          color: i % 3 === 0 ? "#ffd27a" : i % 2 === 0 ? "#ff5c8a" : "#ff2d6b",
         };
       }),
     []
@@ -60,6 +63,7 @@ function BigHeart({ value }) {
     <div className="heart-stage">
       <span className="ring ring-1" />
       <span className="ring ring-2" />
+      <span className="ring ring-3" />
 
       {bursts.map((b, i) => (
         <span
@@ -69,10 +73,11 @@ function BigHeart({ value }) {
             "--dx": `${b.dx}px`,
             "--dy": `${b.dy}px`,
             fontSize: `${b.size}px`,
+            color: b.color,
             animationDelay: `${b.delay}s`,
           }}
         >
-          ♥
+          {b.symbol}
         </span>
       ))}
 
@@ -83,12 +88,18 @@ function BigHeart({ value }) {
               <path d={HEART_PATH} />
             </clipPath>
             <linearGradient id="liquid" x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ff6b8f" />
-              <stop offset="100%" stopColor="#b3123f" />
+              <stop offset="0%" stopColor="#f9a0b8" />
+              <stop offset="42%" stopColor="#e8295c" />
+              <stop offset="100%" stopColor="#900030" />
+            </linearGradient>
+            <linearGradient id="liquidBack" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stopColor="#ffcce0" stopOpacity="0.80" />
+              <stop offset="100%" stopColor="#c01445" stopOpacity="0.80" />
             </linearGradient>
             <linearGradient id="glass" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#fff" stopOpacity="0.95" />
-              <stop offset="100%" stopColor="#ffd3de" stopOpacity="0.8" />
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.95" />
+              <stop offset="55%" stopColor="#fff0f5" stopOpacity="0.90" />
+              <stop offset="100%" stopColor="#ffd8e8" stopOpacity="0.85" />
             </linearGradient>
             <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
               <feGaussianBlur stdDeviation="6" result="b" />
@@ -106,8 +117,7 @@ function BigHeart({ value }) {
               <g className="wave wave-back">
                 <path
                   d="M0 8 Q25 -2 50 8 T100 8 T150 8 T200 8 T250 8 T300 8 V220 H0 Z"
-                  fill="#ff8fa9"
-                  opacity="0.55"
+                  fill="url(#liquidBack)"
                 />
               </g>
               <g className="wave wave-front">
@@ -119,15 +129,24 @@ function BigHeart({ value }) {
             </g>
           </g>
 
+          {/* Ánh sáng phản chiếu — glass highlight */}
           <path
             d="M30 28 C38 14 56 10 66 16"
             fill="none"
-            stroke="#fff"
+            stroke="#ffffff"
             strokeWidth="6"
             strokeLinecap="round"
-            opacity="0.85"
+            opacity="0.9"
           />
-          <path d={HEART_PATH} fill="none" stroke="#fff" strokeWidth="3" opacity="0.9" />
+          <path
+            d="M32 30 C38 18 52 14 62 18"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            opacity="0.95"
+          />
+          <path d={HEART_PATH} fill="none" stroke="#fff" strokeWidth="3" opacity="0.6" />
         </svg>
 
         <div className="percent" aria-live="polite">
@@ -139,19 +158,22 @@ function BigHeart({ value }) {
   );
 }
 
-/* ---------- Nền trái tim bay lên ---------- */
+/* ---------- Nền trái tim và ánh sao lãng mạn ---------- */
 function FloatingHearts() {
-  const items = useMemo(
-    () =>
-      Array.from({ length: 22 }, () => ({
-        left: Math.random() * 100,
-        size: 12 + Math.random() * 26,
-        duration: 9 + Math.random() * 10,
-        delay: -Math.random() * 18,
-        opacity: 0.25 + Math.random() * 0.4,
-      })),
-    []
-  );
+  const items = useMemo(() => {
+    const symbols = ["♥", "💖", "✦", "♥", "✧", "💕", "♥", "✨", "🌸", "♥"];
+    return Array.from({ length: 26 }, (_, i) => ({
+      symbol: symbols[i % symbols.length],
+      left: Math.random() * 100,
+      size: 13 + Math.random() * 24,
+      duration: 10 + Math.random() * 12,
+      delay: -Math.random() * 20,
+      opacity: 0.35 + Math.random() * 0.52,
+      drift: (Math.random() - 0.5) * 44,
+      rot: (Math.random() - 0.5) * 50,
+      color: i % 4 === 0 ? "#ffd27a" : i % 3 === 0 ? "#ff5c8a" : "#ff2d6b",
+    }));
+  }, []);
 
   return (
     <div className="bg-hearts" aria-hidden="true">
@@ -161,12 +183,15 @@ function FloatingHearts() {
           style={{
             left: `${h.left}%`,
             fontSize: `${h.size}px`,
+            color: h.color,
             animationDuration: `${h.duration}s`,
             animationDelay: `${h.delay}s`,
-            opacity: h.opacity,
+            "--item-opacity": h.opacity,
+            "--drift": `${h.drift}px`,
+            "--rot": `${h.rot}deg`,
           }}
         >
-          ♥
+          {h.symbol}
         </span>
       ))}
     </div>
@@ -185,15 +210,16 @@ function MiniHeart({ pct }) {
             <path d={HEART_PATH} />
           </clipPath>
           <linearGradient id={`g${uid}`} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#ff6b8f" />
-            <stop offset="100%" stopColor="#b3123f" />
+            <stop offset="0%" stopColor="#ff5c8a" />
+            <stop offset="50%" stopColor="#ff2d6b" />
+            <stop offset="100%" stopColor="#8c0030" />
           </linearGradient>
         </defs>
-        <path d={HEART_PATH} fill="#ffc2d1" />
+        <path d={HEART_PATH} fill="transparent" />
         <g clipPath={`url(#c${uid})`}>
           <rect x="-10" y={y} width="220" height="220" fill={`url(#g${uid})`} />
         </g>
-        <path d={HEART_PATH} fill="none" stroke="#fff" strokeWidth="5" />
+        <path d={HEART_PATH} fill="none" stroke="#ff2d6b" strokeWidth="5" opacity="0.7" />
       </svg>
       <span className="pin-pct">
         {pct}
@@ -213,7 +239,11 @@ function PinColumn({ side, pins, onRemove }) {
       className={`pins-col ${side} ${mine.length ? "has-items" : ""}`}
       aria-label="Cặp đôi đã ghim"
     >
-      <h2 className="pins-head">♥ Đã ghim ♥</h2>
+      <div className="pins-head-wrap">
+        <h2 className="pins-head">
+          <span className="head-heart">♥</span> Đã ghim <span className="head-heart">♥</span>
+        </h2>
+      </div>
 
       <ul className="pins-list">
         {mine.map((p) => (
@@ -221,11 +251,11 @@ function PinColumn({ side, pins, onRemove }) {
             <span className="pushpin" />
             <div className="pin-names" style={{ "--n": p.a.length + p.b.length + 3 }}>
               <span>{p.a}</span>
-              <i>♥</i>
+              <i className="pin-sep">♥</i>
               <span>{p.b}</span>
             </div>
             <MiniHeart pct={p.pct} />
-            <button className="pin-x" onClick={() => onRemove(p.id)} aria-label="Bỏ ghim">
+            <button className="pin-x" onClick={() => onRemove(p.id)} aria-label="Bỏ ghim" title="Bỏ ghim">
               ×
             </button>
           </li>
@@ -233,7 +263,8 @@ function PinColumn({ side, pins, onRemove }) {
 
         {Array.from({ length: empty }, (_, i) => (
           <li key={`empty-${i}`} className="slot" aria-hidden="true">
-            <span>♥</span>
+            <span className="slot-heart">♡</span>
+            <span className="slot-hint">Chờ ghim</span>
           </li>
         ))}
       </ul>
@@ -358,10 +389,21 @@ export default function App() {
       <FloatingHearts />
 
       <header className="brand">
-        <span className="brand-name">My love</span>
+        <div className="brand-badge">
+          <span className="brand-sparkle left">✨</span>
+          <span className="brand-name">My love</span>
+          <span className="brand-sparkle right">✨</span>
+        </div>
       </header>
 
-      <h1 className="title">Comment tên của 2 bạn để xem độ phù hợp</h1>
+      <div className="title-wrap">
+        <h1 className="title">Comment tên của 2 bạn để xem độ phù hợp</h1>
+        <div className="title-ornament" aria-hidden="true">
+          <span className="line" />
+          <span className="heart">❦</span>
+          <span className="line" />
+        </div>
+      </div>
 
       <div className="cluster">
         <PinColumn side="left" pins={pins} onRemove={removePin} />
@@ -369,8 +411,11 @@ export default function App() {
         <main className="main">
           {stage === "form" && (
             <form className="card" onSubmit={handleSubmit}>
+              <div className="card-sparkle-top">✦ ♡ ✦</div>
               <label className="field">
-                <span>Tên người thứ nhất</span>
+                <span className="field-title">
+                  <i className="field-icon">♥</i> Tên người thứ nhất
+                </span>
                 <input
                   ref={input1Ref}
                   value={name1}
@@ -382,13 +427,15 @@ export default function App() {
               </label>
 
               <div className="between" aria-hidden="true">
-                <i />
-                <b>♥</b>
-                <i />
+                <i className="line-left" />
+                <span className="heart-bead">♥</span>
+                <i className="line-right" />
               </div>
 
               <label className="field">
-                <span>Tên người thứ hai</span>
+                <span className="field-title">
+                  <i className="field-icon">♥</i> Tên người thứ hai
+                </span>
                 <input
                   value={name2}
                   onChange={(e) => setName2(e.target.value)}
@@ -398,35 +445,60 @@ export default function App() {
                 />
               </label>
 
-              <button className="btn" type="submit" disabled={!canSubmit}>
-                Xem độ phù hợp
+              <button className="btn btn-submit" type="submit" disabled={!canSubmit}>
+                <span className="btn-text">Xem độ phù hợp</span>
+                <span className="btn-icon">💖</span>
               </button>
             </form>
           )}
 
           {stage === "loading" && (
             <div className="loading" role="status">
-              <div className="mini-heart">♥</div>
+              <div className="loading-ripple">
+                <span className="pulse-ring r1" />
+                <span className="pulse-ring r2" />
+                <span className="pulse-ring r3" />
+                <div className="mini-heart">♥</div>
+              </div>
               <p>Đang lắng nghe nhịp tim của hai bạn…</p>
+              <div className="loading-dots">
+                <span />
+                <span />
+                <span />
+              </div>
             </div>
           )}
 
           {stage === "result" && (
             <section className="result">
-              <p className="couple" style={{ "--n": couple.a.length + couple.b.length + 3 }}>
-                {couple.a} <span>♥</span> {couple.b}
-              </p>
+              <div className="couple-badge">
+                <p className="couple" style={{ "--n": couple.a.length + couple.b.length + 3 }}>
+                  <span className="name-a">{couple.a}</span>
+                  <span className="couple-heart">♥</span>
+                  <span className="name-b">{couple.b}</span>
+                </p>
+              </div>
 
               <BigHeart value={shown} />
 
-              <p className={`message ${done ? "show" : ""}`}>{getMessage(target)}</p>
+              <div className={`message-card ${done ? "show" : ""}`}>
+                <span className="quote-mark">“</span>
+                <p className="message">{getMessage(target)}</p>
+                <span className="quote-mark">”</span>
+              </div>
 
               <div className={`actions ${done ? "show" : ""}`}>
-                <button className="btn" onClick={handlePin} disabled={isPinned}>
-                  {isPinned ? "Đã ghim ✓" : "♥ Ghim cặp đôi"}
+                <button
+                  className={`btn btn-pin ${isPinned ? "pinned" : ""}`}
+                  onClick={handlePin}
+                  disabled={isPinned}
+                >
+                  <span className="btn-icon">{isPinned ? "✓" : "♥"}</span>
+                  <span className="btn-text">{isPinned ? "Đã ghim thành công" : "Ghim cặp đôi"}</span>
                 </button>
                 <button className="btn ghost" onClick={reset}>
-                  Thử cặp khác
+                  <span className="btn-icon">↺</span>
+                  <span className="btn-text">Thử cặp khác</span>
                 </button>
               </div>
             </section>
